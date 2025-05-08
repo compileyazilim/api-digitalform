@@ -1,0 +1,237 @@
+openapi: 3.0.3
+info:
+  title: Digital Application and Approval API
+  version: 1.0.0
+  description: Dijital Başvuru ve Dijital Onay entegrasyon servisleri
+
+servers:
+  - url: https://api.agito.com.tr/digital
+    description: Production Server
+
+components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+
+  schemas:
+    BaseResponse:
+      type: object
+      properties:
+        isSuccess:
+          type: boolean
+        errorMessage:
+          type: string
+
+security:
+  - BasicAuth: []
+
+paths:
+
+  # --- Modül 1: Digital Application ---
+
+  /CreateApplication:
+    post:
+      summary: Başvuru oluşturur
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                customerId:
+                  type: string
+                policyData:
+                  type: object
+      responses:
+        '200':
+          description: Başvuru oluşturma sonucu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+
+  /UpdateApplication:
+    post:
+      summary: Başvuruyu günceller
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                applicationId:
+                  type: string
+                updatedData:
+                  type: object
+      responses:
+        '200':
+          description: Başvuru güncelleme sonucu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+
+  /GetApplicationStatus:
+    get:
+      summary: Başvuru durumunu getirir
+      parameters:
+        - name: applicationId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Başvuru durumu bilgisi
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      status:
+                        type: string
+
+  # --- Modül 2: Digital Approval ---
+
+  /CheckDigitalApproveEntry:
+    post:
+      summary: Dijital onay ekranına giriş yapılacak mı kontrolü
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                customerId:
+                  type: string
+                policyId:
+                  type: string
+      responses:
+        '200':
+          description: Giriş yapılabilir mi?
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      isAllow:
+                        type: boolean
+
+  /GetDigitalApproveInfoLink:
+    post:
+      summary: KVKK, ETK, Geçiş onayı metinleri linklerini getir
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                customerId:
+                  type: string
+                policyId:
+                  type: string
+      responses:
+        '200':
+          description: Onay metin linkleri
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+                  - type: object
+                    properties:
+                      approveInfoLinkList:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            link:
+                              type: string
+                            description:
+                              type: string
+
+  /UpdateDigitalApprove:
+    post:
+      summary: KVKK, ETK, Geçiş onaylarını güncelle
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                customerId:
+                  type: string
+                policyId:
+                  type: string
+                kvkkApprove:
+                  type: integer
+                  enum: [0, 1]
+                etkApprove:
+                  type: integer
+                  enum: [0, 1]
+                transitionInfoApprove:
+                  type: integer
+                  enum: [0, 1]
+      responses:
+        '200':
+          description: Onay güncelleme sonucu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+
+  /UpdateDigitalApproveIban:
+    post:
+      summary: IBAN bilgisi güncelleme
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                customerId:
+                  type: string
+                policyId:
+                  type: string
+                ibanNumber:
+                  type: string
+      responses:
+        '200':
+          description: IBAN güncelleme sonucu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+
+  /ApproveDigitalApprove:
+    post:
+      summary: Dijital onay süreci tamamlandı bilgisi
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                customerId:
+                  type: string
+                policyId:
+                  type: string
+      responses:
+        '200':
+          description: Süreç tamamlandı sonucu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
