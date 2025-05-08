@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Digital Application and Approval API
   version: 1.0.0
-  description: Dijital Başvuru ve Dijital Onay entegrasyon servisleri
+  description: Hande. Dijital Başvuru ve Dijital Onay entegrasyon servisleri
 
 servers:
   - url: https://api.agito.com.tr/digital
